@@ -16,11 +16,10 @@ return new class extends Migration
             $table->string('nama');
             $table->string('username')->unique();
             $table->string('password');
-            $table->foreignId('unit_id')->constrained('units')->onDelete('cascade');
+            $table->foreignId('unit_id')->constrained();
             $table->date('tanggal_bergabung');
             $table->timestamps();
         });
-        
     }
 
     /**
