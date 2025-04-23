@@ -1,6 +1,5 @@
-# Manajemen Karyawan
-
-![Manajemen Karyawan](https://i.postimg.cc/R3ypPmq7/IMG-20250423-WA0002.jpg)
+ # Manajemen Karyawan
+  <img src="https://i.imgur.com/zK5EWcj.png" width="800"/>
 
 Aplikasi Manajemen Data Karyawan berbasis web dengan fitur pengelolaan **Unit**, **Jabatan**, dan **Statistik Login**. Dibangun dengan **Laravel 12.9.2** sebagai backend REST API dan **Next.js 15.3.1** sebagai frontend SPA, serta menggunakan **Tailwind CSS** untuk antarmuka modern.
 
