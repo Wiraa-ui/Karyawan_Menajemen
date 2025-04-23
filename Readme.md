@@ -33,9 +33,8 @@ Aplikasi Manajemen Data Karyawan berbasis web dengan fitur pengelolaan **Unit**,
 
 ## 🚀 Instalasi
 
-### Backend (Laravel)
-
 ```bash
+### Backend (Laravel)
 cd laravel-backend
 composer install
 php artisan key:generate
