@@ -21,21 +21,35 @@ class DummySeeder extends Seeder
         DB::table('jabatan_karyawan')->truncate();
         DB::statement("SET FOREIGN_KEY_CHECKS=1");
 
-        // Buat daftar unit dan jabatan
-        $units = ['Manajemen', 'Keuangan', 'Gudang', 'Penjualan', 'Logistik', 'Keamanan', 'Pemasaran', 'SDM', 'Operasional', 'Pembelian'];
-        $jabatans = ['Store Manager', 'Supervisor', 'Accountant', 'Kasir', 'Staf Gudang', 'Sales', 'Customer Service', 'Driver', 'Security', 'HRD'];
+        // Relasi unit dan jabatan yang logis
+        $unitJabatanMap = [
+            'Manajemen' => ['Store Manager', 'Supervisor'],
+            'Keuangan' => ['Accountant'],
+            'Gudang' => ['Staf Gudang', 'Supervisor'],
+            'Penjualan' => ['Sales', 'Kasir'],
+            'Logistik' => ['Driver'],
+            'Keamanan' => ['Security'],
+            'Pemasaran' => ['Customer Service'],
+            'SDM' => ['HRD'],
+            'Operasional' => ['Supervisor'],
+            'Pembelian' => ['Supervisor'],
+        ];
 
-        foreach ($units as $unit) {
-            Unit::create(['nama' => $unit]);
+        $unitIds = [];
+        $jabatanIds = [];
+
+        foreach ($unitJabatanMap as $unit => $jabatans) {
+            $unitModel = Unit::create(['nama' => $unit]);
+            $unitIds[$unit] = $unitModel->id;
+
+            foreach ($jabatans as $jabatan) {
+                if (!array_key_exists($jabatan, $jabatanIds)) {
+                    $jabatanModel = Jabatan::create(['nama' => $jabatan]);
+                    $jabatanIds[$jabatan] = $jabatanModel->id;
+                }
+            }
         }
-        foreach ($jabatans as $jabatan) {
-            Jabatan::create(['nama' => $jabatan]);
-        }
 
-        $unitIds = Unit::pluck('id')->toArray();
-        $jabatanIds = Jabatan::pluck('id')->toArray();
-
-        // Nama-nama karyawan
         $names = [
             'Budi Santoso', 'Siti Rahayu', 'Ahmad Hidayat', 'Dewi Lestari', 'Rudi Hermawan',
             'Ani Wijaya', 'Joko Susilo', 'Rina Puspita', 'Agus Setiawan', 'Maya Indah',
@@ -44,22 +58,26 @@ class DummySeeder extends Seeder
         $karyawanIds = [];
 
         foreach ($names as $index => $name) {
+            $unitName = array_rand($unitJabatanMap); // Acak unit
+            $unitId = $unitIds[$unitName];
+
             $karyawan = Karyawan::create([
                 'nama' => $name,
                 'username' => strtolower(explode(' ', $name)[0]) . $index,
                 'password' => 'admin123',
-                'unit_id' => $unitIds[array_rand($unitIds)],
-                'tanggal_bergabung' => now()->subMonths(rand(1, 24))->format('Y-m-d')
+                'unit_id' => $unitId,
+                'tanggal_bergabung' => now()->subMonths(rand(1, 24))->format('Y-m-d'),
             ]);
 
-            // Hubungkan jabatan secara acak
-            $jabatanId = $jabatanIds[array_rand($jabatanIds)];
+            // Ambil jabatan yang relevan dari unit yang sama
+            $jabatanNama = $unitJabatanMap[$unitName][array_rand($unitJabatanMap[$unitName])];
+            $jabatanId = $jabatanIds[$jabatanNama];
             $karyawan->jabatans()->attach($jabatanId);
 
             $karyawanIds[] = $karyawan->id;
         }
 
-        // Buat 200 login random dari 10 karyawan
+        // 200 login acak dari 10 karyawan
         for ($i = 0; $i < 200; $i++) {
             Login::create([
                 'karyawan_id' => $karyawanIds[array_rand($karyawanIds)],
@@ -70,6 +88,6 @@ class DummySeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Seeder selesai: 10 karyawan dengan login acak (200 data).');
+        $this->command->info('Seeder selesai dijalankan.');
     }
 }
