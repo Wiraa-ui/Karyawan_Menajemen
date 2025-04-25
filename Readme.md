@@ -24,7 +24,7 @@ Aplikasi Manajemen Data Karyawan berbasis web dengan fitur pengelolaan **Unit**,
 
 | Stack       | Tools                         |
 |-------------|-------------------------------|
-| **Backend** | Laravel 12.9.2, Sanctum, Faker |
+| **Backend** | Laravel 12.9.2, Sanctum       |
 | **Frontend**| Next.js 15.3.1, Tailwind CSS, TypeScript |
 | **Database**| MySQL             |
 | **API**     | RESTful                       |
