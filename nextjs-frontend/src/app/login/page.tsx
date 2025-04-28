@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "@/utils/axios";
+import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { LoginCredentials, LoginResponse } from "@/types";
 
@@ -38,12 +39,13 @@ export default function Login() {
 
       // Redirect ke dashboard
       router.push("/dashboard");
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
       console.error("Login error:", err);
 
       // Tampilkan pesan error yang lebih spesifik
       setError(
-        err.response?.data?.message ||
+        error.response?.data?.message ||
           "Username atau password salah. Silakan coba lagi."
       );
 

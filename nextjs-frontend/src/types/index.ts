@@ -69,7 +69,7 @@ export interface ApiResponse<T> {
 }
 
 // Response khusus untuk statistik dashboard
-export interface DashboardApiResponse extends ApiResponse<DashboardStats> {}
+export type DashboardApiResponse = ApiResponse<DashboardStats>;
 
 // Response saat login berhasil
 export interface LoginResponse {

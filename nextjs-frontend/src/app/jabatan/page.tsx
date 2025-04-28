@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import axios from "@/utils/axios";
+import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Jabatan, ApiResponse } from "@/types";
 
@@ -32,10 +33,11 @@ export default function JabatanPage() {
         if (jabatanRes.data.success) {
           setJabatans(jabatanRes.data.data || []);
         }
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
+      } catch (err: unknown) {
+        const error = err as AxiosError<{ message?: string }>;
+        console.error("Error fetching data:", error);
         setError("Gagal memuat data");
-        if (err.response && err.response.status === 401) {
+        if (error.response && error.response.status === 401) {
           localStorage.removeItem("token");
           router.push("/login");
         }
@@ -87,12 +89,13 @@ export default function JabatanPage() {
         setIsEditing(false);
         setCurrentId(null);
       }
-    } catch (err: any) {
-      console.error("Error saving jabatan:", err);
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
+      console.error("Error saving jabatan:", error);
       setError(
-        err.response?.data?.message || "Terjadi kesalahan saat menyimpan data"
+        error.response?.data?.message || "Terjadi kesalahan saat menyimpan data"
       );
-      if (err.response && err.response.status === 401) {
+      if (error.response && error.response.status === 401) {
         localStorage.removeItem("token");
         router.push("/login");
       }
@@ -133,12 +136,13 @@ export default function JabatanPage() {
           setJabatans(updatedRes.data.data || []);
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
       console.error("Error deleting jabatan:", err);
       setError(
-        err.response?.data?.message || "Terjadi kesalahan saat menghapus data"
+        error.response?.data?.message || "Terjadi kesalahan saat menghapus data"
       );
-      if (err.response && err.response.status === 401) {
+      if (error.response && error.response.status === 401) {
         localStorage.removeItem("token");
         router.push("/login");
       }

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import axios from "@/utils/axios";
+import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Karyawan, Unit, Jabatan, ApiResponse } from "@/types";
 import SearchableSelect from "@/components/SearchableSelect";
@@ -42,9 +43,10 @@ export default function KaryawanPage() {
         if (kRes.data.success) setKaryawans(kRes.data.data || []);
         if (uRes.data.success) setUnits(uRes.data.data || []);
         if (jRes.data.success) setJabatans(jRes.data.data || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         setError("Gagal memuat data");
-        if (err.response?.status === 401) {
+        const error = err as AxiosError<{ message?: string }>;
+        if (error.response?.status === 401) {
           localStorage.removeItem("token");
           router.push("/login");
         }
@@ -115,8 +117,9 @@ export default function KaryawanPage() {
         setIsEditing(false);
         setCurrentId(null);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Gagal menyimpan data");
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
+      setError(error.response?.data?.message || "Gagal menyimpan data");
     } finally {
       setLoading(false);
     }
@@ -149,8 +152,9 @@ export default function KaryawanPage() {
         const updated = await axios.get<ApiResponse<Karyawan[]>>("/karyawans");
         if (updated.data.success) setKaryawans(updated.data.data || []);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Gagal menghapus data");
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
+      setError(error.response?.data?.message || "Gagal menghapus data");
     }
   };
 

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import axios from "@/utils/axios";
+import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Unit, ApiResponse } from "@/types";
 
@@ -32,10 +33,11 @@ export default function UnitsPage() {
         if (unitRes.data.success) {
           setUnits(unitRes.data.data || []);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as AxiosError<{ message?: string }>;
         console.error("Error fetching data:", err);
         setError("Gagal memuat data");
-        if (err.response?.status === 401) {
+        if (error.response?.status === 401) {
           localStorage.removeItem("token");
           router.push("/login");
         }
@@ -87,12 +89,13 @@ export default function UnitsPage() {
         setIsEditing(false);
         setCurrentId(null);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
       console.error("Error saving unit:", err);
       setError(
-        err.response?.data?.message || "Terjadi kesalahan saat menyimpan data"
+        error.response?.data?.message || "Terjadi kesalahan saat menyimpan data"
       );
-      if (err.response?.status === 401) {
+      if (error.response?.status === 401) {
         localStorage.removeItem("token");
         router.push("/login");
       }
@@ -132,12 +135,13 @@ export default function UnitsPage() {
           setUnits(updatedRes.data.data || []);
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
       console.error("Error deleting unit:", err);
       setError(
-        err.response?.data?.message || "Terjadi kesalahan saat menghapus data"
+        error.response?.data?.message || "Terjadi kesalahan saat menghapus data"
       );
-      if (err.response?.status === 401) {
+      if (error.response?.status === 401) {
         localStorage.removeItem("token");
         router.push("/login");
       }

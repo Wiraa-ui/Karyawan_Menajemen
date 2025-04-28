@@ -29,7 +29,6 @@ export default function SearchableSelect({
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -67,13 +66,11 @@ export default function SearchableSelect({
     if (alreadyExists) return;
 
     try {
-      setIsLoading(true);
       await onAddNew(newName);
       setSearchTerm("");
     } catch (error) {
       console.error("Gagal menambahkan data:", error);
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -127,7 +124,7 @@ export default function SearchableSelect({
                   className="mt-2 text-blue-400 hover:text-blue-300 cursor-pointer"
                   onClick={handleAddNew}
                 >
-                  + Tambah unit "{searchTerm}"
+                  + Tambah unit {`"${searchTerm}"`}
                 </div>
               </div>
             ) : null}

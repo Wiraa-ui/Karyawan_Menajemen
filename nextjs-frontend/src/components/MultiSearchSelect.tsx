@@ -30,7 +30,6 @@ export default function MultiSearchSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [newItemMode, setNewItemMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,13 +82,11 @@ export default function MultiSearchSelect({
       }
 
       try {
-        setIsLoading(true);
         await onAddNew(namaBaru);
         setSearchTerm("");
       } catch (err) {
         console.error("Gagal tambah item:", err);
       } finally {
-        setIsLoading(false);
       }
     }
   };
@@ -154,14 +151,14 @@ export default function MultiSearchSelect({
                 {option.nama}
               </div>
             ))
-          ) : searchTerm.trim() && onAddNew ? (
+          ) : searchTerm.trim() !== "" && onAddNew ? ( // <-- perbaikan
             <div className="p-2 text-center text-gray-400">
               Tidak ada hasil.
               <div
                 className="mt-2 text-blue-400 hover:text-blue-300 cursor-pointer"
                 onClick={handleAddNew}
               >
-                + Tambah jabatan "{searchTerm}"
+                + Tambah jabatan {`&quot;${searchTerm}&quot;`}
               </div>
             </div>
           ) : null}

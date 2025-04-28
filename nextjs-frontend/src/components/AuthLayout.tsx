@@ -21,7 +21,7 @@ export default function AuthLayout({
     } else {
       setIsAuthenticated(true);
     }
-  }, [pathname]);
+  }, [pathname, router]);
 
   if (isAuthenticated === null && pathname !== "/login") {
     return (
