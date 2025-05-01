@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Karyawan, Unit, Jabatan, ApiResponse } from "@/types";
 import SearchableSelect from "@/components/SearchableSelect";
 import MultiSearchSelect from "@/components/MultiSearchSelect";
+import ActionButton from "@/components/ActionButton";
 
 export default function KaryawanPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function KaryawanPage() {
   const [formData, setFormData] = useState<Partial<Karyawan>>({
     nama: "",
     username: "",
+    email: "",
     password: "",
     unit_id: 0,
     tanggal_bergabung: "",
@@ -30,8 +32,9 @@ export default function KaryawanPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return router.push("/login");
+      // No need to check localStorage for token, HttpOnly cookie handles auth
+      // const token = localStorage.getItem("token");
+      // if (!token) return router.push("/login");
 
       setLoading(true);
       try {
@@ -47,7 +50,7 @@ export default function KaryawanPage() {
         setError("Gagal memuat data");
         const error = err as AxiosError<{ message?: string }>;
         if (error.response?.status === 401) {
-          localStorage.removeItem("token");
+          // localStorage.removeItem("token"); // Removed: Handled by HttpOnly cookie
           router.push("/login");
         }
       } finally {
@@ -92,8 +95,9 @@ export default function KaryawanPage() {
     const dataToSend = { ...formData, jabatans: selectedJabatans };
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return router.push("/login");
+      // No need to check localStorage for token, HttpOnly cookie handles auth
+      // const token = localStorage.getItem("token");
+      // if (!token) return router.push("/login");
 
       const res =
         isEditing && currentId
@@ -109,6 +113,7 @@ export default function KaryawanPage() {
         setFormData({
           nama: "",
           username: "",
+          email: "",
           password: "",
           unit_id: 0,
           tanggal_bergabung: "",
@@ -129,6 +134,7 @@ export default function KaryawanPage() {
     setFormData({
       nama: karyawan.nama,
       username: karyawan.username,
+      email: karyawan.email,
       password: "",
       unit_id: karyawan.unit_id,
       tanggal_bergabung: karyawan.tanggal_bergabung,
@@ -143,8 +149,9 @@ export default function KaryawanPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin hapus karyawan ini?")) return;
-    const token = localStorage.getItem("token");
-    if (!token) return router.push("/login");
+    // No need to check localStorage for token, HttpOnly cookie handles auth
+    // const token = localStorage.getItem("token");
+    // if (!token) return router.push("/login");
 
     try {
       const res = await axios.delete<ApiResponse<null>>(`/karyawans/${id}`);
@@ -162,6 +169,7 @@ export default function KaryawanPage() {
     setFormData({
       nama: "",
       username: "",
+      email: "",
       password: "",
       unit_id: 0,
       tanggal_bergabung: "",
@@ -208,6 +216,16 @@ export default function KaryawanPage() {
               placeholder="Username"
               required
               value={formData.username}
+              onChange={handleChange}
+              className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
+            />
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              required={!isEditing}
+              value={formData.email}
               onChange={handleChange}
               className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white"
             />
@@ -293,40 +311,38 @@ export default function KaryawanPage() {
           <table className="min-w-full bg-gray-700 rounded-lg">
             <thead className="bg-gray-600">
               <tr>
-                <th className="py-3 px-4 text-left">Nama</th>
-                <th className="py-3 px-4 text-left">Username</th>
-                <th className="py-3 px-4 text-left">Unit</th>
-                <th className="py-3 px-4 text-left">Jabatan</th>
-                <th className="py-3 px-4 text-left">Tanggal Bergabung</th>
-                <th className="py-3 px-4 text-left">Aksi</th>
+                <th className="py-3 px-4">Nama</th>
+                <th className="py-3 px-4">Username</th>
+                <th className="py-3 px-4">Unit</th>
+                <th className="py-3 px-4">Jabatan</th>
+                <th className="py-3 px-4">Tanggal Bergabung</th>
+                <th className="py-3 px-4">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {filteredKaryawans.map((karyawan) => (
                 <tr
                   key={karyawan.id}
-                  className="border-t border-gray-600 hover:bg-gray-600"
+                  className="border-t border-gray-600 hover:bg-gray-600 text-center"
                 >
-                  <td className="py-3 px-4">{karyawan.nama}</td>
-                  <td className="py-3 px-4">{karyawan.username}</td>
-                  <td className="py-3 px-4">{karyawan.unit?.nama}</td>
-                  <td className="py-3 px-4">
+                  <td className="py-6 px-4">{karyawan.nama}</td>
+                  <td className="py-6 px-4">{karyawan.username}</td>
+                  <td className="py-6 px-4">{karyawan.unit?.nama}</td>
+                  <td className="py-6 px-4">
                     {karyawan.jabatans?.map((j) => j.nama).join(", ")}
                   </td>
                   <td className="py-3 px-4">{karyawan.tanggal_bergabung}</td>
-                  <td className="py-3 px-4">
-                    <button
+                  <td className="py-3 px-4 flex justify-center space-x-2">
+                    <ActionButton
+                      label="Edit"
                       onClick={() => handleEdit(karyawan)}
-                      className="px-3 py-1 bg-yellow-600 text-white rounded mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
+                      variant="edit"
+                    />
+                    <ActionButton
+                      label="Hapus"
                       onClick={() => handleDelete(karyawan.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded"
-                    >
-                      Hapus
-                    </button>
+                      variant="delete"
+                    />
                   </td>
                 </tr>
               ))}

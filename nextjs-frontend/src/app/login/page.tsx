@@ -1,12 +1,18 @@
+// src/app/login/page.tsx
 "use client";
 import { useState } from "react";
-import axios from "@/utils/axios";
+import axios from "@/utils/axios"; // Use the configured axios instance
 import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import { LoginCredentials, LoginResponse } from "@/types";
+import type { Karyawan } from "@/types"; // Assuming Karyawan type exists for user data
+
+interface LoginResponse {
+  user: Karyawan;
+  // No token expected in response body anymore
+}
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [loginIdentifier, setLoginIdentifier] = useState(""); // Changed from username
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,36 +24,33 @@ export default function Login() {
     setError("");
 
     try {
-      // Kirim request login ke backend
-      const credentials: LoginCredentials = { username, password };
-      const response = await axios.post<LoginResponse>("/login", credentials);
+      // Send login request to backend with login_identifier
+      const credentials = { login_identifier: loginIdentifier, password };
+      // Axios instance already configured withCredentials: true
+      await axios.post<LoginResponse>("/login", credentials);
 
-      // Pastikan kita mengakses struktur respons dengan benar
-      const { data } = response;
-
-      if (!data?.token) {
-        throw new Error("Token tidak ditemukan dalam respons");
-      }
-
-      // Simpan token di localStorage
-      localStorage.setItem("token", data.token);
-
-      // Opsional: Simpan juga informasi user jika diperlukan
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
-
-      // Redirect ke dashboard
+      // Redirect to dashboard
       router.push("/dashboard");
     } catch (err: unknown) {
-      const error = err as AxiosError<{ message?: string }>;
+      const error = err as AxiosError<{
+        message?: string;
+        errors?: Record<string, string[]>;
+      }>;
       console.error("Login error:", err);
 
-      // Tampilkan pesan error yang lebih spesifik
-      setError(
-        error.response?.data?.message ||
-          "Username atau password salah. Silakan coba lagi."
-      );
+      // Handle validation errors from backend
+      if (error.response?.data?.errors) {
+        const errorMessages = Object.values(error.response.data.errors)
+          .flat()
+          .join(" ");
+        setError(`Login gagal: ${errorMessages}`);
+      } else {
+        // Handle general authentication errors
+        setError(
+          error.response?.data?.message ||
+            "Login gagal. Periksa kembali username/email dan password Anda."
+        );
+      }
 
       // Animasi error
       const form = document.querySelector("form");
@@ -62,30 +65,30 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#1a202c] w-full p-0 m-0 absolute inset-0">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-md space-y-6 transition-all text-gray-900"
+        className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md space-y-6 transition-all text-gray-100"
       >
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Login Sistem
           </h1>
-          <p className="text-gray-500">Masukkan kredensial Anda</p>
+          <p className="text-gray-400">Masukkan kredensial Anda</p>
         </div>
 
         <div className="space-y-4">
           <div>
             <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              htmlFor="login_identifier" // Changed from username
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
-              Username
+              Username atau Email {/* Changed label */}
             </label>
             <input
-              id="username"
+              id="login_identifier" // Changed from username
               type="text"
-              placeholder="Masukkan username"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-black"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Masukkan username atau email" // Changed placeholder
+              className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              value={loginIdentifier}
+              onChange={(e) => setLoginIdentifier(e.target.value)}
               required
             />
           </div>
@@ -93,7 +96,7 @@ export default function Login() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-300 mb-1"
             >
               Password
             </label>
@@ -101,7 +104,7 @@ export default function Login() {
               id="password"
               type="password"
               placeholder="Masukkan password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-black"
+              className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -110,7 +113,7 @@ export default function Login() {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 text-red-700 rounded-md flex items-center gap-2">
+          <div className="p-3 bg-red-900 bg-opacity-50 text-red-300 rounded-md flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -130,7 +133,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
         >
           {loading ? (
             <>
@@ -160,7 +163,17 @@ export default function Login() {
             "Login"
           )}
         </button>
+        <p className="text-sm text-center text-gray-400">
+          Belum punya akun?{" "}
+          <a
+            href="/register"
+            className="font-medium text-indigo-400 hover:text-indigo-300"
+          >
+            Daftar di sini
+          </a>
+        </p>
       </form>
     </div>
   );
 }
+

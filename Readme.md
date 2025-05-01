@@ -1,4 +1,5 @@
- # Manajemen Karyawan
+# Manajemen Karyawan
+
   <img src="https://i.imgur.com/zK5EWcj.png" width="800"/>
 
 Aplikasi Manajemen Data Karyawan berbasis web dengan fitur pengelolaan **Unit**, **Jabatan**, dan **Statistik Login**. Dibangun dengan **Laravel 12.9.2** sebagai backend REST API dan **Next.js 15.3.1** sebagai frontend SPA, serta menggunakan **Tailwind CSS** untuk antarmuka modern.
@@ -22,12 +23,12 @@ Aplikasi Manajemen Data Karyawan berbasis web dengan fitur pengelolaan **Unit**,
 
 ## 🧱 Teknologi
 
-| Stack       | Tools                         |
-|-------------|-------------------------------|
-| **Backend** | Laravel 12.9.2, Sanctum       |
-| **Frontend**| Next.js 15.3.1, Tailwind CSS, TypeScript |
-| **Database**| MySQL             |
-| **API**     | REST                       |
+| Stack        | Tools                                    |
+| ------------ | ---------------------------------------- |
+| **Backend**  | Laravel 12.9.2, JWT                      |
+| **Frontend** | Next.js 15.3.1, Tailwind CSS, TypeScript |
+| **Database** | MySQL                                    |
+| **API**      | REST                                     |
 
 ---
 
@@ -46,3 +47,4 @@ php artisan serve
 cd nextjs-frontend
 npm install
 npm run dev
+```

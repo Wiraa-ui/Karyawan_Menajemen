@@ -49,16 +49,18 @@ export default function MultiSearchSelect({
     };
   }, []);
 
-  const selectedOptions = options.filter((option) =>
+  const selectedOptions = (options && Array.isArray(options)) ? options.filter((option) =>
     values.includes(option.id)
-  );
+  ) : [];
 
   const filteredOptions =
-    searchTerm.trim() === ""
-      ? options
-      : options.filter((option) =>
-          option.nama.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    (options && Array.isArray(options)) ? (
+      searchTerm.trim() === ""
+        ? options
+        : options.filter((option) =>
+            option.nama.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+    ) : [];
 
   const toggleOption = (id: number) => {
     if (values.includes(id)) {
@@ -73,10 +75,10 @@ export default function MultiSearchSelect({
     if (onAddNew && searchTerm.trim() !== "") {
       const namaBaru = searchTerm.trim();
 
-      // Cek apakah sudah ada
-      const alreadyExists = options.some(
+      // Cek apakah sudah ada (Ensure options is an array before checking)
+      const alreadyExists = (options && Array.isArray(options)) ? options.some(
         (opt) => opt.nama.toLowerCase() === namaBaru.toLowerCase()
-      );
+      ) : false;
       if (alreadyExists) {
         return;
       }

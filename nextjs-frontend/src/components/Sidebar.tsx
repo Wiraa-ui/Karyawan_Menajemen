@@ -2,6 +2,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import api from "@/utils/axios"; // Sesuaikan path jika berbeda
 
 export default function Sidebar({
   onSidebarToggle,
@@ -19,9 +20,13 @@ export default function Sidebar({
     }
   }, [isCollapsed, onSidebarToggle]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      await api.post("/logout"); // Menggunakan instance axios yang sudah pakai withCredentials
+      router.push("/login"); // Redirect ke login setelah logout
+    } catch (error) {
+      console.error("Logout gagal:", error);
+    }
   };
 
   const menuItems = [

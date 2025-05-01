@@ -4,6 +4,7 @@ import axios from "@/utils/axios";
 import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Unit, ApiResponse } from "@/types";
+import ActionButton from "@/components/ActionButton";
 
 export default function UnitsPage() {
   const router = useRouter();
@@ -17,16 +18,10 @@ export default function UnitsPage() {
   const [currentId, setCurrentId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const formRef = useRef<HTMLDivElement>(null); // 🔽 Ref untuk scroll ke form
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
       setLoading(true);
       try {
         const unitRes = await axios.get<ApiResponse<Unit[]>>("/units");
@@ -38,7 +33,6 @@ export default function UnitsPage() {
         console.error("Error fetching data:", err);
         setError("Gagal memuat data");
         if (error.response?.status === 401) {
-          localStorage.removeItem("token");
           router.push("/login");
         }
       } finally {
@@ -63,12 +57,6 @@ export default function UnitsPage() {
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
       let res;
       if (isEditing && currentId) {
         res = await axios.put<ApiResponse<Unit>>(
@@ -96,7 +84,6 @@ export default function UnitsPage() {
         error.response?.data?.message || "Terjadi kesalahan saat menyimpan data"
       );
       if (error.response?.status === 401) {
-        localStorage.removeItem("token");
         router.push("/login");
       }
     } finally {
@@ -108,8 +95,6 @@ export default function UnitsPage() {
     setFormData({ nama: unit.nama });
     setIsEditing(true);
     setCurrentId(unit.id);
-
-    // 🔽 Scroll ke form
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -122,12 +107,6 @@ export default function UnitsPage() {
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
       const res = await axios.delete<ApiResponse<null>>(`/units/${id}`);
       if (res.data.success) {
         const updatedRes = await axios.get<ApiResponse<Unit[]>>("/units");
@@ -142,7 +121,6 @@ export default function UnitsPage() {
         error.response?.data?.message || "Terjadi kesalahan saat menghapus data"
       );
       if (error.response?.status === 401) {
-        localStorage.removeItem("token");
         router.push("/login");
       }
     } finally {
@@ -242,34 +220,31 @@ export default function UnitsPage() {
         ) : filteredUnits.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden">
-              <thead className="bg-gray-600">
+              <thead className="bg-gray-600 text-center">
                 <tr>
-                  <th className="py-3 px-4 text-left">ID</th>
-                  <th className="py-3 px-4 text-left">Nama</th>
-                  <th className="py-3 px-4 text-left">Aksi</th>
+                  <th className="py-3 px-4">ID</th>
+                  <th className="py-3 px-4">Nama</th>
+                  <th className="py-3 px-4">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUnits.map((unit) => (
-                  <tr
-                    key={unit.id}
-                    className="border-t border-gray-600 hover:bg-gray-600"
-                  >
+                  <tr key={unit.id} className="text-center">
                     <td className="py-3 px-4">{unit.id}</td>
                     <td className="py-3 px-4">{unit.nama}</td>
                     <td className="py-3 px-4">
-                      <button
-                        onClick={() => handleEdit(unit)}
-                        className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-white mr-2"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(unit.id)}
-                        className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white"
-                      >
-                        Hapus
-                      </button>
+                      <div className="flex justify-center space-x-2">
+                        <ActionButton
+                          label="Edit"
+                          onClick={() => handleEdit(unit)}
+                          variant="edit"
+                        />
+                        <ActionButton
+                          label="Hapus"
+                          onClick={() => handleDelete(unit.id)}
+                          variant="delete"
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

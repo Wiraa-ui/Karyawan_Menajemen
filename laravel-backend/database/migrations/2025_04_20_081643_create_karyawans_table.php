@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('karyawans', function (Blueprint $table) {
+        Schema::create("karyawans", function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('username')->unique();
-            $table->string('password');
-            $table->foreignId('unit_id')->constrained();
-            $table->date('tanggal_bergabung');
+            $table->string("nama");
+            $table->string("email")->unique(); // Added email field
+            $table->string("username")->unique();
+            $table->string("password");
+            $table->foreignId("unit_id")->constrained();
+            $table->date("tanggal_bergabung");
             $table->timestamps();
         });
     }
@@ -27,6 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('karyawans');
+        Schema::dropIfExists("karyawans");
     }
 };
+

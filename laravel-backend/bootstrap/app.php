@@ -12,7 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Register middleware alias
+        $middleware->alias([
+            'jwt.cookieparser' => \App\Http\Middleware\SetAuthorizationHeaderFromCookie::class,
+        ]);
+
+        // Add middleware to the 'api' group, ensuring it runs first
+        $middleware->prependToGroup('api', [
+            \App\Http\Middleware\SetAuthorizationHeaderFromCookie::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

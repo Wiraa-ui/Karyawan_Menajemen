@@ -18,6 +18,7 @@ export interface Karyawan {
   id: number;
   nama: string;
   username: string;
+  email: string;
   password?: string; // Password sebagai opsional
   unit_id: number;
   unit?: Unit;

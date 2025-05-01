@@ -64,7 +64,8 @@ class DummySeeder extends Seeder
             $karyawan = Karyawan::create([
                 'nama' => $name,
                 'username' => strtolower(explode(' ', $name)[0]) . $index,
-                'password' => 'admin123',
+                'email' => strtolower(explode(' ', $name)[0]) . $index . '@example.com',
+                'password' => \Illuminate\Support\Facades\Hash::make('admin123'), // Hash the default password
                 'unit_id' => $unitId,
                 'tanggal_bergabung' => now()->subMonths(rand(1, 24))->format('Y-m-d'),
             ]);

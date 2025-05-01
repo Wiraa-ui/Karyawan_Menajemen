@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   const cookieData = request.cookies.get("jwt_token"); // Get cookie object
   const token = cookieData?.value || "";
   console.log(`[Middleware] JWT Cookie Data:`, cookieData); // Log the whole cookie object
-  console.log(`[Middleware] Extracted Token: ${token ? "Present" : "Missing"}`); // Log if token value exists
+  console.log(`[Middleware] Extracted Token: ${token ? 'Present' : 'Missing'}`); // Log if token value exists
 
   // Jika pengguna belum terautentikasi dan mencoba mengakses route yang dilindungi,
   // redirect ke halaman login

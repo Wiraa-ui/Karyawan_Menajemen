@@ -4,6 +4,7 @@ import axios from "@/utils/axios";
 import type { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Jabatan, ApiResponse } from "@/types";
+import ActionButton from "@/components/ActionButton";
 
 export default function JabatanPage() {
   const router = useRouter();
@@ -21,11 +22,12 @@ export default function JabatanPage() {
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
+      // No need to check localStorage for token, HttpOnly cookie handles auth
+      // const token = localStorage.getItem("token");
+      // if (!token) {
+      //   router.push("/login");
+      //   return;
+      // }
 
       setLoading(true);
       try {
@@ -63,11 +65,12 @@ export default function JabatanPage() {
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
+      // No need to check localStorage for token, HttpOnly cookie handles auth
+      // const token = localStorage.getItem("token");
+      // if (!token) {
+      //   router.push("/login");
+      //   return;
+      // }
 
       let res;
       if (isEditing && currentId) {
@@ -123,11 +126,12 @@ export default function JabatanPage() {
     setError("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
+      // No need to check localStorage for token, HttpOnly cookie handles auth
+      // const token = localStorage.getItem("token");
+      // if (!token) {
+      //   router.push("/login");
+      //   return;
+      // }
 
       const res = await axios.delete<ApiResponse<null>>(`/jabatans/${id}`);
       if (res.data.success) {
@@ -248,32 +252,29 @@ export default function JabatanPage() {
             <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden">
               <thead className="bg-gray-600">
                 <tr>
-                  <th className="py-3 px-4 text-left">ID</th>
-                  <th className="py-3 px-4 text-left">Nama</th>
-                  <th className="py-3 px-4 text-left">Aksi</th>
+                  <th className="py-3 px-4">ID</th>
+                  <th className="py-3 px-4">Nama</th>
+                  <th className="py-3 px-4">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredJabatans.map((jabatan) => (
-                  <tr
-                    key={jabatan.id}
-                    className="border-t border-gray-600 hover:bg-gray-600"
-                  >
+                  <tr key={jabatan.id} className="text-center">
                     <td className="py-3 px-4">{jabatan.id}</td>
                     <td className="py-3 px-4">{jabatan.nama}</td>
                     <td className="py-3 px-4">
-                      <button
-                        onClick={() => handleEdit(jabatan)}
-                        className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-white mr-2"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(jabatan.id)}
-                        className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-white"
-                      >
-                        Hapus
-                      </button>
+                      <div className="flex space-x-2 justify-center items-center">
+                        <ActionButton
+                          label="Edit"
+                          onClick={() => handleEdit(jabatan)}
+                          variant="edit"
+                        />
+                        <ActionButton
+                          label="Hapus"
+                          onClick={() => handleDelete(jabatan.id)}
+                          variant="delete"
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

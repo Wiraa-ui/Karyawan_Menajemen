@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Karyawan;
 use App\Models\Unit;
 use App\Models\Jabatan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash; // Import Hash facade
 
 class KaryawanController extends Controller
 {
@@ -46,6 +47,7 @@ class KaryawanController extends Controller
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:255',
                 'username' => 'required|string|max:255|unique:karyawans',
+                'email' => 'nullable|email|max:255|unique:karyawans,email',
                 'password' => 'required|string|min:6',
                 'unit_id' => 'required|exists:units,id',
                 'tanggal_bergabung' => 'required|date',
@@ -65,7 +67,8 @@ class KaryawanController extends Controller
             $karyawan = Karyawan::create([
                 'nama' => $request->nama,
                 'username' => $request->username,
-                'password' => $request->password, // Not hashed as per requirements
+                'email' => $request->email,
+                'password' => Hash::make($request->password), // Hash the password
                 'unit_id' => $request->unit_id,
                 'tanggal_bergabung' => $request->tanggal_bergabung
             ]);
@@ -125,6 +128,7 @@ class KaryawanController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255|unique:karyawans,email,' . $id,
                 'username' => 'required|string|max:255|unique:karyawans,username,' . $id,
                 'password' => 'nullable|string|min:6',
                 'unit_id' => 'required|exists:units,id',
@@ -146,6 +150,7 @@ class KaryawanController extends Controller
             
             $updateData = [
                 'nama' => $request->nama,
+                'email' => $request->email,
                 'username' => $request->username,
                 'unit_id' => $request->unit_id,
                 'tanggal_bergabung' => $request->tanggal_bergabung
@@ -153,7 +158,7 @@ class KaryawanController extends Controller
             
             // Only update password if provided
             if ($request->filled('password')) {
-                $updateData['password'] = $request->password; // Not hashed as per requirements
+                $updateData['password'] = Hash::make($request->password); // Hash the password
             }
             
             $karyawan->update($updateData);

@@ -1,13 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "@/utils/axios";
-import { useRouter } from "next/navigation";
 import { ApiResponse, DashboardStats, TopUser } from "@/types";
 
 export default function DashboardPage() {
-  const router = useRouter();
-
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalKaryawan: 0,
@@ -26,15 +23,9 @@ export default function DashboardPage() {
     red: "bg-red-600",
   };
 
-  const fetchData = async () => {
+  const handleFetch = useCallback(async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.replace("/login");
-        return;
-      }
-
       let url = "/dashboard";
       if (dateRange.from && dateRange.to) {
         url += `?from_date=${dateRange.from}&to_date=${dateRange.to}`;
@@ -51,27 +42,26 @@ export default function DashboardPage() {
         topUsers: data.top_users ?? [],
       });
     } catch (err) {
-      console.error("Error fetching dashboard data:", err);
+      console.error("Gagal memuat data dashboard:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange]);
 
-  // Fetch data pertama kali saat halaman load
-  useState(() => {
-    fetchData();
-  });
+  useEffect(() => {
+    handleFetch();
+  }, [handleFetch]);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+    <div className="p-6 space-y-6 bg-[#1a202c] min-h-screen">
+      <h1 className="text-3xl font-bold mb-4 text-white">Dashboard</h1>
 
       {/* Filter */}
       <div className="bg-gray-800 p-4 rounded-xl">
         <div className="grid md:grid-cols-3 gap-4">
           <input
             type="date"
-            className="bg-gray-700 rounded p-2"
+            className="bg-gray-700 rounded p-2 text-white"
             value={dateRange.from}
             onChange={(e) =>
               setDateRange({ ...dateRange, from: e.target.value })
@@ -79,15 +69,16 @@ export default function DashboardPage() {
           />
           <input
             type="date"
-            className="bg-gray-700 rounded p-2"
+            className="bg-gray-700 rounded p-2 text-white"
             value={dateRange.to}
             onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
           />
           <button
-            onClick={fetchData}
-            className="bg-blue-600 hover:bg-blue-700 p-2 rounded"
+            onClick={handleFetch}
+            className="bg-blue-600 hover:bg-blue-700 p-2 rounded text-white"
+            disabled={loading}
           >
-            Terapkan Filter
+            {loading ? "Memuat..." : "Terapkan Filter"}
           </button>
         </div>
       </div>
@@ -104,7 +95,10 @@ export default function DashboardPage() {
           { label: "Total Unit", value: stats.totalUnit, color: "purple" },
           { label: "Total Jabatan", value: stats.totalJabatan, color: "red" },
         ].map((stat, i) => (
-          <div key={i} className={`${colorClasses[stat.color]} p-4 rounded-xl`}>
+          <div
+            key={i}
+            className={`${colorClasses[stat.color]} p-4 rounded-xl text-white`}
+          >
             <h3 className="text-lg font-semibold">{stat.label}</h3>
             <p className="text-3xl font-bold">{loading ? "..." : stat.value}</p>
           </div>
@@ -112,14 +106,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Top Users */}
-      <div className="bg-gray-800 p-4 rounded-xl">
+      <div className="bg-gray-800 p-4 rounded-xl text-white">
         <h2 className="text-xl font-semibold mb-4">Top Pengguna Aktif</h2>
         <p className="text-sm text-yellow-400 mb-4 bg-yellow-800 px-3 py-1 inline-block rounded-lg">
           Hanya menampilkan pengguna dengan login lebih dari 25x
         </p>
+
         {loading ? (
           <div className="text-center">Loading...</div>
-        ) : stats.topUsers.length > 0 ? (
+        ) : stats.topUsers && stats.topUsers.length > 0 ? (
           <table className="w-full text-left table-auto">
             <thead>
               <tr className="bg-gray-700">

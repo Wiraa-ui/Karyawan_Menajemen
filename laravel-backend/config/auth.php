@@ -40,7 +40,7 @@ return [
             'provider' => 'karyawans',
         ],
         'api' => [
-            'driver' => 'sanctum',
+            'driver' => 'jwt', // Changed to jwt driver
             'provider' => 'karyawans',
         ],
     ],
