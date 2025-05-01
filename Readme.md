@@ -8,7 +8,7 @@ Aplikasi Manajemen Data Karyawan berbasis web dengan fitur pengelolaan **Unit**,
 
 ## ✨ Fitur Utama
 
-- 🔐 Autentikasi login (token-based dengan Laravel Sanctum)
+- 🔐 Autentikasi login (token-based dengan JWT)
 - 👨‍💼 Manajemen data karyawan (CRUD)
 - 🏢 Manajemen unit (CRUD)
 - 🧾 Manajemen jabatan (CRUD)
